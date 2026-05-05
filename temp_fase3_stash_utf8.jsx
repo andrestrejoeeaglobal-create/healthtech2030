@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { formatText } from '../../utils/utils';
 import VisualBodyMap from '../VisualBodyMap';
 import SearchableVerticalMenu from '../ui/SearchableVerticalMenu';
@@ -8,23 +8,27 @@ import { usePatientLinguistics } from '../../hooks/usePatientLinguistics';
 import { analyzeClinicalMotive } from '../../hooks/useCortex';
 
 const motiveOptions = [
-    { label: "Adicciones y Sustancias", value: "GOAL_ADDICTIONS" },
-    { label: "Adulto Mayor (Geriatr├¡a)", value: "GOAL_GERIATRICS" },
-    { label: "Alergias Graves (Protocolo Anafilaxia)", value: "GOAL_ALLERGIES" },
+    // A. Control Metab├│lico y Estilo de Vida
     { label: "Bajar de Peso / Sobrepeso", value: "GOAL_WEIGHT_LOSS" },
-    { label: "Bari├ítrica / Quir├║rgico", value: "GOAL_BARIATRIC" },
-    { label: "Climaterio y Menopausia", value: "GOAL_MENOPAUSE" },
     { label: "Control Cl├¡nico (Patolog├¡as Cr├│nicas)", value: "GOAL_CLINICAL" },
-    { label: "Cuidados Paliativos", value: "GOAL_PALLIATIVE" },
-    { label: "Discapacidad y Rehabilitaci├│n", value: "GOAL_DISABILITY" },
-    { label: "Embarazo y Lactancia", value: "GOAL_PREGNANCY" },
     { label: "Ganar M├║sculo / Deporte (Rendimiento)", value: "GOAL_MUSCLE" },
-    { label: "Oncolog├¡a Nutricional", value: "GOAL_ONCOLOGY" },
-    { label: "Pediatr├¡a (Crecimiento y Desarrollo)", value: "GOAL_PEDIATRICS" },
     { label: "Prevenci├│n y Longevidad (Biohacking)", value: "GOAL_LONGEVITY" },
+    // B. Etapa de Vida y Condici├│n Fisiol├│gica
+    { label: "Pediatr├¡a (Crecimiento y Desarrollo)", value: "GOAL_PEDIATRICS" },
+    { label: "Embarazo y Lactancia", value: "GOAL_PREGNANCY" },
+    { label: "Adulto Mayor (Geriatr├¡a)", value: "GOAL_GERIATRICS" },
+    { label: "Climaterio y Menopausia", value: "GOAL_MENOPAUSE" },
+    // C. Alta Especialidad y Riesgo Cl├¡nico
     { label: "Salud Mental / TCA (Seguridad Conductual)", value: "GOAL_MENTAL_HEALTH" },
+    { label: "Bari├ítrica / Quir├║rgico", value: "GOAL_BARIATRIC" },
     { label: "Salud Renal (Nefropat├¡a)", value: "GOAL_RENAL" },
-    { label: "VIH e Inmunodeficiencias", value: "GOAL_IMMUNE" }
+    { label: "Oncolog├¡a Nutricional", value: "GOAL_ONCOLOGY" },
+    { label: "VIH e Inmunodeficiencias", value: "GOAL_IMMUNE" },
+    { label: "Cuidados Paliativos", value: "GOAL_PALLIATIVE" },
+    // D. Seguridad y Accesibilidad
+    { label: "Alergias Graves (Protocolo Anafilaxia)", value: "GOAL_ALLERGIES" },
+    { label: "Adicciones y Sustancias", value: "GOAL_ADDICTIONS" },
+    { label: "Discapacidad y Rehabilitaci├│n", value: "GOAL_DISABILITY" }
 ];
 
 const goalMap = {
@@ -98,7 +102,7 @@ const Fase3_MotivoConsulta = ({ setMessages, onPhaseComplete, patientData, setPa
                 return { ...opt, label: "Inmunolog├¡a Pedi├ítrica" };
             }
             return opt;
-        }).sort((a, b) => a.label.localeCompare(b.label));
+        });
     };
 
     const [inputValue, setInputValue] = useState("");
