@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lic. Andrés Trejo Maldonado | CEO & Healthtech 2030</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Matter.js Physics Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Link de Estilos Oficiales para los Hexágonos de Equipo en Acción® -->
+    <link rel="stylesheet" href="https://equipoenaccion.net/css/loadingEAstyle.css" />
+
+    <style>
+        /* Importación de tipografías oficiales con CDN del ecosistema y fallbacks */
+        @font-face {
+            font-family: 'Prototype';
+            src: url('https://equipoenaccion.net/fonts/Prototype.woff2') format('woff2'),
+                 local('Prototype'), local('Prototype-Regular');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Sansation';
+            src: url('https://equipoenaccion.net/fonts/Sansation-Regular.woff2') format('woff2'),
+                 local('Sansation'), local('Sansation-Regular');
+            font-display: swap;
+        }
+
+        /* Hardening CSS & Color Tokens */
+        :root {
+            --color-33plus: #B70E0C;
+            --color-rosa-ea: #F29FC5;
+            --color-corporate: #1C75BC;
+            --color-34plus: #3AAA35;
+            --color-yellow-ea: #FFCC00;
+            --color-navy: #0F172A;
+            --bg-clinical: #F8FAFC;
+        }
+
+        /* REGLA DE CSS OBLIGATORIA para física en el DOM */
+        .physics-body {
+            transform-origin: center center;
+            position: absolute;
+            will-change: transform;
+            user-select: none;
+            cursor: grab;
+        }
+        .physics-body:active {
+            cursor: grabbing;
+        }
+
+        /* Tipografías - Ruta Dual ELM */
+        .font-sans {
+            font-family: 'Sansation', 'Inter', sans-serif;
+        }
+        .font-serif {
+            font-family: 'Prototype', 'Playfair Display', serif;
+        }
+
+        /* Transiciones fluidas */
+        .transition-all-fluid {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Ajustes específicos de animación para el loader e interacción */
+        #loader {
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            z-index: 100;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Sansation', 'Inter', 'sans-serif'],
+                        serif: ['Prototype', 'Playfair Display', 'serif']
+                    },
+                    colors: {
+                        ea: {
+                            red33: '#B70E0C',
+                            pink: '#F29FC5',
+                            corporate: '#1C75BC',
+                            green34: '#3AAA35',
+                            yellow: '#FFCC00',
+                            navy: '#0F172A',
+                            clinical: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-sans antialiased bg-ea-clinical text-ea-navy dark:bg-ea-navy dark:text-ea-clinical transition-colors duration-300">
+
+    <!-- 18.B BRAND LOADER (Overlay Centrado Absoluto) -->
+    <div id="loader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white dark:bg-[#0F172A] transition-opacity duration-500 p-4 pointer-events-auto select-none overflow-hidden">
+        <div class="flex flex-col items-center gap-6">
+            <!-- Componente de los 5 Hexágonos (Centrado Estricto Inviolable con Estructura Oficial de Clase) -->
+            <div class="flex items-center justify-center space-x-3 mx-auto" style="justify-content: center; margin: 0 auto;">
+                <svg width="32" height="28" viewBox="0 0 576 512" style="transform: rotate(180deg);"><path fill="#B70E0C" d="M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z"/></svg>
+                <svg width="32" height="28" viewBox="0 0 576 512" style="transform: rotate(180deg);"><path fill="#F29FC5" d="M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z"/></svg>
+                <svg width="32" height="28" viewBox="0 0 576 512" style="transform: rotate(90deg);"><path fill="#1C75BC" d="M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z"/></svg>
+                <svg width="32" height="28" viewBox="0 0 576 512" style="transform: rotate(180deg);"><path fill="#3AAA35" d="M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z"/></svg>
+                <svg width="32" height="28" viewBox="0 0 576 512" style="transform: rotate(180deg);"><path fill="#FFCC00" d="M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z"/></svg>
+            </div>
+            <!-- Progress indicator -->
+            <div class="w-48 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full bg-ea-corporate animate-[loading_1.5s_ease-in-out_infinite]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navegación Sticky (Ergonomía Táctil 44px + Dark Mode) -->
+    <nav class="fixed w-full z-50 bg-white/90 dark:bg-ea-navy/90 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="font-serif font-black text-2xl tracking-wider text-ea-corporate dark:text-white flex items-center gap-2">
+                        ATM<span class="text-ea-red33">.</span>
+                    </span>
+                </div>
+                <!-- Menú Escritorio -->
+                <div class="hidden md:flex space-x-6 items-center">
+                    <a href="#inicio" class="text-sm font-semibold text-slate-655 dark:text-slate-200 hover:text-ea-corporate dark:hover:text-white transition h-11 flex items-center px-2">Visión 2030</a>
+                    <a href="#tilo" class="text-sm font-semibold text-slate-655 dark:text-slate-200 hover:text-ea-corporate dark:hover:text-white transition h-11 flex items-center px-2">Plataforma T.I.L.O.®</a>
+                    <a href="#innovacion" class="text-sm font-semibold text-slate-655 dark:text-slate-200 hover:text-ea-corporate dark:hover:text-white transition h-11 flex items-center px-2">I+D Nutricional</a>
+                    <a href="#herami" class="text-sm font-semibold text-slate-655 dark:text-slate-200 hover:text-ea-corporate dark:hover:text-white transition h-11 flex items-center px-2">Granja El Herami</a>
+                    <a href="#masterlog" class="text-sm font-semibold text-slate-655 dark:text-slate-200 hover:text-ea-corporate dark:hover:text-white transition h-11 flex items-center px-2">El Legado</a>
+                    
+                    <!-- Botón Modo Oscuro (Target Mínimo 44px) -->
+                    <button id="dark-mode-toggle" class="w-11 h-11 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" aria-label="Cambiar modo de color">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    
+                    <a href="#masterlog" class="px-6 py-2.5 text-sm font-semibold text-white bg-ea-corporate hover:bg-ea-corporate/90 rounded-full transition shadow-lg shadow-ea-corporate/20 h-11 flex items-center justify-center">
+                        Master Log
+                    </a>
+                </div>
+                <!-- Botón Menú Móvil -->
+                <div class="md:hidden flex items-center space-x-2">
+                    <button id="dark-mode-toggle-mobile" class="w-11 h-11 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300" aria-label="Cambiar modo de color móvil">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:block"></i>
+                    </button>
+                    <button id="mobile-menu-btn" class="w-11 h-11 text-slate-600 dark:text-slate-300 hover:text-ea-corporate focus:outline-none flex items-center justify-center" aria-label="Menu">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-ea-navy border-t border-slate-200 dark:border-slate-800 px-4 py-4 space-y-3">
+            <a href="#inicio" class="block text-base font-semibold text-slate-700 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">Visión 2030</a>
+            <a href="#tilo" class="block text-base font-semibold text-slate-700 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">Plataforma T.I.L.O.®</a>
+            <a href="#innovacion" class="block text-base font-semibold text-slate-700 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">I+D Nutricional</a>
+            <a href="#herami" class="block text-base font-semibold text-slate-700 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">Granja El Herami</a>
+            <a href="#masterlog" class="block text-base font-semibold text-slate-700 dark:text-slate-200 py-2 border-b border-slate-100 dark:border-slate-800">El Legado</a>
+        </div>
+    </nav>
+
+    <!-- INICIO (Hero Section - Layout Split 50/50 en Escritorio) -->
+    <section id="inicio" class="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-ea-navy dark:to-slate-900 transition-colors duration-300">
+        <!-- Elementos Decorativos -->
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-ea-corporate/5 dark:bg-ea-corporate/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-[400px] h-[400px] bg-ea-pink/5 dark:bg-ea-pink/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[60vh]">
+                <!-- Texto Descriptivo -->
+                <div class="space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ea-corporate/10 text-ea-corporate dark:text-blue-300 text-xs font-bold tracking-wider uppercase">
+                        <span class="w-2 h-2 rounded-full bg-ea-corporate animate-ping"></span>
+                        CEO • Equipo en Acción®
+                    </div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-slate-900 dark:text-white font-serif">
+                        Liderando la Transición hacia el Modelo <span class="text-ea-corporate dark:text-blue-400">Healthtech 2030</span>
+                    </h1>
+                    <p class="text-lg text-slate-655 dark:text-slate-200 leading-relaxed max-w-lg">
+                        Integrando inteligencia artificial corporativa, nutrición molecular de alta precisión y biotecnología agrícola regenerativa para el bienestar familiar y social.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <a href="#tilo" class="px-8 py-3.5 bg-ea-corporate hover:bg-ea-corporate/90 text-white font-bold rounded-xl shadow-lg shadow-ea-corporate/25 hover:shadow-xl transition-all duration-200 flex items-center justify-center min-w-[160px] min-h-[44px]">
+                            Conocer T.I.L.O.®
+                        </a>
+                        <a href="#masterlog" class="px-8 py-3.5 bg-white dark:bg-slate-800 text-ea-navy dark:text-white font-bold rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 shadow-sm hover:shadow transition-all duration-200 flex items-center justify-center min-w-[160px] min-h-[44px]">
+                            El Legado Vivo
+                        </a>
+                    </div>
+                </div>
+                <!-- Visual / Imagen -->
+                <div class="relative lg:pl-10">
+                    <div class="aspect-[4/5] bg-slate-200 dark:bg-slate-800 rounded-3xl overflow-hidden shadow-2xl relative flex items-center justify-center border-4 border-white dark:border-slate-855 group transition-all duration-500">
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Lic. Andrés Trejo Maldonado" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-multiply dark:mix-blend-normal group-hover:scale-105 transition-transform duration-700">
+                        <!-- Degradado decorativo -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-ea-navy/70 via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute bottom-6 left-6 right-6 z-10 text-white">
+                            <p class="text-xs uppercase tracking-widest text-ea-pink font-extrabold mb-1">Estrategia Global</p>
+                            <h4 class="text-xl font-bold font-serif">Lic. Andrés Trejo Maldonado</h4>
+                        </div>
+                    </div>
+                    <!-- Stats Card flotante (Acciones del Pulgar y Micro-animaciones) -->
+                    <div class="absolute -bottom-6 -left-6 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-slate-200/50 dark:border-slate-700/50 hover:-translate-y-2 transition-transform duration-300 flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-ea-corporate/10 dark:bg-ea-corporate/20 rounded-full flex items-center justify-center text-ea-corporate dark:text-blue-300">
+                            <i class="fas fa-chart-line text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Logro Optimizado</p>
+                            <p class="text-lg font-black text-slate-900 dark:text-white">Visión Horizon 2030</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PLATAFORMA T.I.L.O. (Bento Grid Structure) -->
+    <section id="tilo" class="py-24 bg-white dark:bg-ea-navy border-t border-slate-100 dark:border-slate-850">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <span class="text-ea-corporate dark:text-blue-400 font-extrabold tracking-widest uppercase text-sm mb-3 block">Arquitectura Inteligente</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4 font-serif">Plataforma T.I.L.O.®</h2>
+                <p class="text-slate-655 dark:text-slate-300 text-lg">
+                    Transformación Inteligente y Logro Optimizado. La arquitectura digital que integra operaciones logísticas, financieras y sistemas de salud mediante Inteligencia Artificial.
+                </p>
+            </div>
+            
+            <!-- Bento Grid Structure - rounded-xl (0.75rem / 12dp), border, elevation -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Bento Card 1: Córtex IA -->
+                <div class="md:col-span-2 p-8 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg transition duration-300 flex flex-col justify-between group min-h-[320px]">
+                    <div class="flex flex-col gap-4">
+                        <div class="w-14 h-14 bg-ea-corporate/10 dark:bg-ea-corporate/20 rounded-xl flex items-center justify-center text-ea-corporate dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-brain text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white font-serif">Córtex Analítico IA</h3>
+                        <p class="text-slate-655 dark:text-slate-300 text-sm leading-relaxed max-w-xl">
+                            Implementación de agentes inteligentes entrenados para la toma de decisiones críticas, modulación metabólica y protección de identidad digital corporativa mediante razonamiento clínico.
+                        </p>
+                    </div>
+                    <div class="pt-4 flex items-center gap-2 text-xs font-bold text-ea-corporate dark:text-blue-450">
+                        <span>Algoritmos de Modulación 34Plus®</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-2 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- Bento Card 2: Sinergia Operativa -->
+                <div class="p-8 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg transition duration-300 flex flex-col justify-between group min-h-[320px]">
+                    <div class="flex flex-col gap-4">
+                        <div class="w-14 h-14 bg-ea-corporate/10 dark:bg-ea-corporate/20 rounded-xl flex items-center justify-center text-ea-corporate dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-network-wired text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white font-serif">Sinergia Operativa</h3>
+                        <p class="text-slate-655 dark:text-slate-300 text-sm leading-relaxed">
+                            Cohesión absoluta entre distribución, finanzas sólidas e infraestructura tecnológica en todos nuestros niveles corporativos.
+                        </p>
+                    </div>
+                    <div class="pt-4 flex items-center gap-2 text-xs font-bold text-ea-corporate dark:text-blue-455">
+                        <span>Integridad de Procesos</span>
+                    </div>
+                </div>
+
+                <!-- Bento Card 3: Infraestructura & Datos -->
+                <div class="p-8 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg transition duration-300 flex flex-col justify-between group min-h-[320px]">
+                    <div class="flex flex-col gap-4">
+                        <div class="w-14 h-14 bg-ea-corporate/10 dark:bg-ea-corporate/20 rounded-xl flex items-center justify-center text-ea-corporate dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-shield-alt text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white font-serif">Infraestructura & Datos</h3>
+                        <p class="text-slate-655 dark:text-slate-300 text-sm leading-relaxed">
+                            Seguridad de la información bajo NOM-004 e interoperabilidad entre Terminales A, B y C. Bases de datos centralizadas con UX homologada.
+                        </p>
+                    </div>
+                    <div class="pt-4 flex items-center gap-2 text-xs font-bold text-ea-corporate dark:text-blue-455">
+                        <span>Mirror Sync & LWW</span>
+                    </div>
+                </div>
+
+                <!-- Bento Card 4: Trazabilidad y Precisión Tabular -->
+                <div class="md:col-span-2 p-8 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60 hover:shadow-lg transition duration-300 flex flex-col justify-between group min-h-[320px]">
+                    <div class="flex flex-col gap-4">
+                        <div class="w-14 h-14 bg-ea-corporate/10 dark:bg-ea-corporate/20 rounded-xl flex items-center justify-center text-ea-corporate dark:text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-lock text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white font-serif">Precisión y Transparencia</h3>
+                        <p class="text-slate-655 dark:text-slate-300 text-sm leading-relaxed max-w-xl">
+                            Visualización de precisión biométrica y financiera en tiempo real, utilizando la directiva CSS de alineación numérica tabular-nums para facilitar la lectura inmediata de auditorías.
+                        </p>
+                    </div>
+                    <div class="pt-4 flex items-center gap-4 text-xs font-bold text-slate-600 dark:text-slate-400">
+                        <span class="font-mono text-ea-corporate dark:text-blue-400">font-variant-numeric: tabular-nums</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- INGENIERÍA NUTRIONAL CON INTEGRACIÓN MATTER.JS (FÍSICA DOM) -->
+    <section id="innovacion" class="py-24 bg-ea-navy text-white relative overflow-hidden">
+        <!-- Elemento de física flotante en segundo plano/lateral -->
+        <div class="absolute right-0 top-0 bottom-0 w-full lg:w-1/3 opacity-30 lg:opacity-100 z-10" id="canvas-physics-container">
+            <!-- Sandbox físico interactivo (Matter.js) -->
+            <div id="physics-sandbox" class="relative w-full h-full min-h-[420px]">
+                
+                <!-- Cápsulas físicas del DOM -->
+                <div class="physics-body px-4 py-2 bg-ea-red33 text-white rounded-full font-bold shadow-lg text-xs" data-shape="pill">33Plus®</div>
+                <div class="physics-body px-4 py-2 bg-ea-green34 text-white rounded-full font-bold shadow-lg text-xs" data-shape="pill">34Plus®</div>
+                <div class="physics-body px-4 py-2 bg-ea-corporate text-white rounded-full font-bold shadow-lg text-xs" data-shape="pill">BIOTECH</div>
+                <div class="physics-body px-4 py-2 bg-ea-yellow text-slate-900 rounded-full font-bold shadow-lg text-xs" data-shape="pill">CLÍNICO</div>
+                <div class="physics-body px-4 py-2 bg-ea-pink text-slate-900 rounded-full font-bold shadow-lg text-xs" data-shape="pill">COA PURE</div>
+                
+                <!-- Hexágonos Físicos Interactivos del Ecosistema (Con clip-path) -->
+                <div class="physics-body w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-300" data-shape="hexagon" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: #B70E0C;" title="Hexágono Rojo 33Plus"></div>
+                <div class="physics-body w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-300" data-shape="hexagon" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: #F29FC5;" title="Hexágono Rosa EA"></div>
+                <div class="physics-body w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-300" data-shape="hexagon" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: #1C75BC;" title="Hexágono Azul Corporativo"></div>
+                <div class="physics-body w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-300" data-shape="hexagon" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: #3AAA35;" title="Hexágono Verde 34Plus"></div>
+                <div class="physics-body w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-300" data-shape="hexagon" style="clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); background: #FFCC00;" title="Hexágono Amarillo EA"></div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Columna 1: Fórmulas -->
+                <div class="order-2 lg:order-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Tarjeta 33 Plus -->
+                    <div class="bg-slate-800/80 backdrop-blur border-l-4 border-ea-red33 p-6 rounded-xl border border-slate-700 hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-black uppercase tracking-widest text-ea-red33 bg-ea-red33/10 px-2 py-0.5 rounded">Fórmula Activa</span>
+                            <!-- Regla del icono ZAP exclusiva para 33Plus -->
+                            <i class="fas fa-bolt text-ea-red33 text-xl"></i>
+                        </div>
+                        <h4 class="text-white text-xl font-bold mb-2 font-serif">33Plus®</h4>
+                        <p class="text-slate-300 text-xs leading-relaxed">
+                            Ignición energética de alto rigor metabólico. Formulado para la termogénesis cognitiva y optimización celular, verificado estrictamente mediante RAG clínico.
+                        </p>
+                    </div>
+                    
+                    <!-- Tarjeta 34 Plus -->
+                    <div class="bg-slate-800/80 backdrop-blur border-l-4 border-ea-green34 p-6 rounded-xl border border-slate-700 hover:shadow-xl transition-all duration-300 sm:mt-8">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-black uppercase tracking-widest text-ea-green34 bg-ea-green34/10 px-2 py-0.5 rounded">Homeostasis</span>
+                            <i class="fas fa-dna text-ea-green34 text-xl"></i>
+                        </div>
+                        <h4 class="text-white text-xl font-bold mb-2 font-serif">34Plus®</h4>
+                        <p class="text-slate-300 text-xs leading-relaxed">
+                            Modulación celular e inulina/spirulina para regeneración de la microbiota. Activa la homeostasis digestiva y el equilibrio sistémico.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Texto -->
+                <div class="order-1 lg:order-2 space-y-6">
+                    <span class="text-ea-pink font-extrabold tracking-widest uppercase text-sm block">Ingeniería Molecular</span>
+                    <h2 class="text-3xl md:text-5xl font-bold mb-6 font-serif">Ingeniería Nutricional</h2>
+                    <p class="text-slate-300 text-lg mb-6 leading-relaxed">
+                        El desarrollo de nutracéuticos exige un rigor científico absoluto. Aplicamos biotecnología avanzada y auditoría presencial en la planta de producción para asegurar la pureza molecular en la Malla Biológica Tropical.
+                    </p>
+                    <ul class="space-y-4 text-slate-300">
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-ea-corporate/20 flex items-center justify-center text-ea-corporate dark:text-blue-300">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <span>Estándares de calidad de grado clínico (COAs certificados)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-ea-corporate/20 flex items-center justify-center text-ea-corporate dark:text-blue-300">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <span>Optimización y dosificación modular vía Córtex Analítico IA</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-ea-corporate/20 flex items-center justify-center text-ea-corporate dark:text-blue-300">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <span>Trazabilidad completa de ingredientes de la tierra al producto terminado</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- GRANJA EL HERAMI (Boceto Estético Premium Tasquillo, Hidalgo) -->
+    <section id="herami" class="py-28 relative overflow-hidden bg-gradient-to-br from-emerald-950 to-teal-900 text-white">
+        <!-- Decoración de fondo -->
+        <div class="absolute -top-12 -right-12 opacity-10 pointer-events-none">
+            <i class="fas fa-leaf text-[24rem]"></i>
+        </div>
+        <div class="absolute -bottom-16 -left-16 opacity-5 pointer-events-none">
+            <i class="fas fa-seedling text-[18rem]"></i>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-emerald-300 font-extrabold tracking-widest uppercase text-sm mb-3 block">Proyecto Agro-Científico</span>
+                <h2 class="text-3xl md:text-5xl font-bold mb-6 font-serif">Granja El Herami</h2>
+                <p class="text-lg text-emerald-100/80 leading-relaxed">
+                    Biotecnología de Precisión y Trabajo Optimizador en Tasquillo, Hidalgo. Operando como Sociedad de Producción Rural para la regeneración de suelos y soberanía biológica en el eje México-Laredo.
+                </p>
+            </div>
+
+            <!-- Bento Mini Grid en la Sección Agro -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white/10 dark:bg-black/20 backdrop-blur-md p-8 rounded-xl border border-white/15 dark:border-white/5 hover:-translate-y-2 transition-transform duration-300 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-300">
+                        <i class="fas fa-seedling text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-2 font-serif text-emerald-200">Permacultura</h4>
+                        <p class="text-xs text-emerald-100/70 leading-relaxed">
+                            Diseño ecológico integral mediante técnicas avanzadas de policultivo e inyección de zanjas Hügelkultur.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 dark:bg-black/20 backdrop-blur-md p-8 rounded-xl border border-white/15 dark:border-white/5 hover:-translate-y-2 transition-transform duration-300 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-300">
+                        <i class="fas fa-water text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-2 font-serif text-emerald-200">Regeneración Hídrica</h4>
+                        <p class="text-xs text-emerald-100/70 leading-relaxed">
+                            Tratamiento biológico del suelo como un organismo vivo, maximizando la retención de agua y bioactivos.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white/10 dark:bg-black/20 backdrop-blur-md p-8 rounded-xl border border-white/15 dark:border-white/5 hover:-translate-y-2 transition-transform duration-300 flex flex-col justify-between min-h-[220px]">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-300">
+                        <i class="fas fa-microscope text-2xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-xl mb-2 font-serif text-emerald-200">Alto Rendimiento</h4>
+                        <p class="text-xs text-emerald-100/70 leading-relaxed">
+                            Medición científica de bioactivos de las plantas para suministrar materias primas puras a Equipo en Acción®.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MASTER LOG: EL LEGADO (Bento Grids y Estética Premium en Relatos) -->
+    <section id="masterlog" class="py-24 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200/50 dark:border-slate-800/50 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <span class="text-ea-corporate dark:text-blue-400 font-extrabold tracking-widest uppercase text-sm mb-3 block">Transcendencia y Raíces</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white font-serif">El Legado Vivo</h2>
+                <p class="text-lg text-slate-550 dark:text-slate-300">De la raíz en el Valle del Mezquital a la Trascendencia Directiva</p>
+            </div>
+
+            <div class="max-w-5xl mx-auto space-y-16">
+                
+                <!-- La Fusión de Dos Fuerzas (Split-Screen / Card Bento) -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 p-8 md:p-12 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col lg:flex-row gap-12 items-center">
+                    <div class="w-full lg:w-1/3">
+                        <div class="aspect-square bg-slate-100 dark:bg-slate-900 rounded-2xl flex items-center justify-center p-6 text-center border-2 border-dashed border-slate-300 dark:border-slate-750 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-ea-corporate/5 dark:bg-ea-corporate/10 z-0"></div>
+                            <div class="relative z-10 flex flex-col items-center justify-center">
+                                <i class="fas fa-landmark text-4xl text-ea-corporate dark:text-blue-300 mb-4 animate-pulse"></i>
+                                <span class="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-1">Archivo Familiar</span>
+                                <p class="text-sm font-semibold text-slate-805 dark:text-slate-300">Don Antonio Trejo & Anastacio Hernández</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 space-y-4">
+                        <h3 class="text-2xl font-bold text-ea-corporate dark:text-blue-400 font-serif">La Fusión de Dos Fuerzas</h3>
+                        <p class="text-slate-655 dark:text-slate-300 leading-relaxed text-sm">
+                            Nuestra estructura corporativa y ética de trabajo no se labró únicamente en las tierras del Mezquital, sino en el rigor intelectual y la diplomacia. Llevamos la herencia de <strong>Don Antonio Trejo Torres</strong>, cuyo arraigo y liderazgo comunitario en Tasquillo sentaron las bases del desarrollo a largo plazo; y la fuerza de <strong>Anastacio Hernández Maldonado</strong>, quien utilizó la ley y la diplomacia revolucionaria en coyunturas críticas de la nación.
+                        </p>
+                        <p class="text-slate-655 dark:text-slate-300 leading-relaxed text-sm">
+                            Sus vidas constituyen el referente de congruencia, lealtad y rectitud moral innegociables sobre los que hoy operan todos nuestros sistemas de negocio.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- El Pilar del Presente (Rosa Institucional - Acompañamiento) -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 p-8 md:p-12 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col lg:flex-row-reverse gap-12 items-center">
+                    <div class="w-full lg:w-1/3">
+                        <div class="aspect-[4/3] bg-ea-pink/10 dark:bg-ea-pink/20 rounded-2xl flex items-center justify-center p-6 text-center border-2 border-dashed border-ea-pink/30 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-ea-pink/20 to-transparent z-0"></div>
+                            <div class="relative z-10 flex flex-col items-center justify-center">
+                                <i class="fas fa-heart text-4xl text-ea-pink mb-4 animate-pulse"></i>
+                                <span class="text-xs font-bold text-ea-pink uppercase tracking-widest mb-1">Centro de Gravedad</span>
+                                <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">Lic. Andrés Trejo & Coco</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 space-y-4">
+                        <h3 class="text-2xl font-bold text-ea-corporate dark:text-blue-400 font-serif">El Pilar del Presente</h3>
+                        <p class="text-slate-655 dark:text-slate-300 leading-relaxed text-sm">
+                            Toda gran transición tecnológica y directiva, como nuestro plan estratégico Horizonte 2030, requiere de un núcleo de soporte inquebrantable. Ese centro de gravedad, mi mayor apoyo y compañera de vida, es <strong>Coco</strong>.
+                        </p>
+                        <p class="text-slate-655 dark:text-slate-300 leading-relaxed text-sm">
+                            Su presencia, alegría y fortaleza dan sentido de calidez humana a las rigideces directivas de la logística, la ingeniería y el desarrollo empresarial.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- El Puente Hacia el Futuro -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 p-8 md:p-12 shadow-md">
+                    <h3 class="text-2xl font-bold text-center text-ea-corporate dark:text-blue-400 mb-6 font-serif">El Puente Hacia el Futuro: Sinergia e Inteligencia</h3>
+                    <p class="text-slate-655 dark:text-slate-300 leading-relaxed text-center max-w-3xl mx-auto mb-10 text-sm">
+                        La evolución de nuestra empresa es una visión que se expande y se perfecciona a través del talento y la continuidad de la siguiente generación, manifestada en el desarrollo estratégico de mis cuatro hijos.
+                    </p>
+                    
+                    <!-- Tarjetas de Hijos (Bento Grid con 4 Columnas) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 text-center hover:scale-102 transition-transform duration-200 flex flex-col justify-between min-h-[140px]">
+                            <i class="fas fa-graduation-cap text-ea-corporate text-lg mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Fer (Fernando)</h4>
+                            <p class="text-slate-500 text-[10px] mt-1 leading-relaxed">Comunicador & Proveedor Estratégico de Materias Primas</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 text-center hover:scale-102 transition-transform duration-200 flex flex-col justify-between min-h-[140px]">
+                            <i class="fas fa-calculator text-ea-corporate text-lg mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Andy (Andrea)</h4>
+                            <p class="text-slate-500 text-[10px] mt-1 leading-relaxed">Administradora y Auditora de Grupo Familiar (c/ Carlos)</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 text-center hover:scale-102 transition-transform duration-200 flex flex-col justify-between min-h-[140px]">
+                            <i class="fas fa-chart-pie text-ea-corporate text-lg mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Karol</h4>
+                            <p class="text-slate-500 text-[10px] mt-1 leading-relaxed">Especialista en Inteligencia de Negocios y Ciencia de Datos</p>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200/50 dark:border-slate-700/50 text-center hover:scale-102 transition-transform duration-200 flex flex-col justify-between min-h-[140px]">
+                            <i class="fas fa-globe-americas text-ea-corporate text-lg mb-2"></i>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Vale (Valeria)</h4>
+                            <p class="text-slate-500 text-[10px] mt-1 leading-relaxed">Línea de Expansión Corporativa Internacional (Atlanta)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- El Propósito Final -->
+                <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 md:p-12 shadow-xl border border-slate-250/50 dark:border-slate-750 text-center relative overflow-hidden mt-12">
+                    <div class="absolute top-0 left-0 w-2.5 h-full bg-ea-corporate"></div>
+                    
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 font-serif">El Propósito de la "Arquitectura de Oro"</h3>
+                    
+                    <div class="aspect-[21/9] w-full max-w-2xl mx-auto bg-slate-100 dark:bg-slate-900 rounded-xl mb-8 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-750 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-t from-ea-navy/40 to-transparent z-0"></div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <i class="fas fa-child text-5xl text-ea-corporate dark:text-blue-300 mb-3 animate-bounce"></i>
+                            <span class="text-xs font-black uppercase text-ea-pink tracking-widest mb-1">Nuestra Razón de Ser</span>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Emmanuel, Valentina & Gabriel</h4>
+                        </div>
+                    </div>
+
+                    <p class="text-slate-655 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto text-sm">
+                        La integración del Córtex IA, la regeneración del suelo en la Granja El Herami y la ingeniería biomédica molecular no son fines en sí mismos; son estructuras construidas para proteger el porvenir. Todo el ecosistema T.I.L.O.® tiene destinatarios con nombre y apellido: mis amados nietos, <strong>Emmanuel, Valentina y Gabriel</strong>.
+                    </p>
+                    <p class="text-slate-655 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto mt-4 text-sm font-semibold text-ea-corporate dark:text-blue-450">
+                        Ellos son la verdadera razón por la que innovamos sin descanso. Diseñamos un ecosistema de soberanía biológica para que las futuras generaciones hereden un entorno fértil y un legado de excelencia donde la ciencia y el amor caminen siempre de la mano.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CON COMPONENTE INVIOLABLE DE 5 HEXÁGONOS EA (MATEMÁTICAMENTE CENTRADO) -->
+    <footer class="bg-ea-navy text-slate-400 py-12 border-t border-slate-800" style="text-align: center;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center gap-6">
+            
+            <!-- Componente de los 5 Hexágonos (Centrado Estricto Inviolable con Estructura Oficial de Clase) -->
+            <div class="flex items-center justify-center space-x-3 mx-auto" style="justify-content: center; margin: 0 auto;">
+                <span>
+                    <svg width='30' height='26' aria-hidden='true' focusable='false' data-prefix='fas' data-icon='hexagon' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' class='hexagon__CustomSVG-sc-7q3egg-0 jwzatX svg-inline--fa fa-hexagon fa-w-18 fa-2x' transform='rotate(180)'>
+                    <path fill='#B70E0C' d='M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z'></path>
+                    </svg>
+                </span>
+                <span>
+                    <svg width='30' height='26' aria-hidden='true' focusable='false' data-prefix='fas' data-icon='hexagon' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' class='hexagon__CustomSVG-sc-7q3egg-0 jwzatX svg-inline--fa fa-hexagon fa-w-18 fa-2x' transform='rotate(180)'>
+                    <path fill='#F29FC5' d='M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z'></path>
+                    </svg>
+                </span>
+                <span>
+                    <svg width='30' height='26' aria-hidden='true' focusable='false' data-prefix='fas' data-icon='hexagon' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' class='hexagon__CustomSVG-sc-7q3egg-0 jwzatX svg-inline--fa fa-hexagon fa-w-18 fa-2x' transform='rotate(90)'>
+                    <path fill='#1C75BC' d='M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z'></path>
+                    </svg>
+                </span>
+                <span>
+                    <svg width='30' height='26' aria-hidden='true' focusable='false' data-prefix='fas' data-icon='hexagon' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' class='hexagon__CustomSVG-sc-7q3egg-0 jwzatX svg-inline--fa fa-hexagon fa-w-18 fa-2x' transform='rotate(180)'>
+                    <path fill='#3AAA35' d='M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z'></path>
+                    </svg>
+                </span>
+                <span>
+                    <svg width='30' height='26' aria-hidden='true' focusable='false' data-prefix='fas' data-icon='hexagon' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512' class='hexagon__CustomSVG-sc-7q3egg-0 jwzatX svg-inline--fa fa-hexagon fa-w-18 fa-2x' transform='rotate(180)'>
+                    <path fill='#FFCC00' d='M441.5 39.8C432.9 25.1 417.1 16 400 16H176c-17.1 0-32.9 9.1-41.5 23.8l-112 192c-8.7 14.9-8.7 33.4 0 48.4l112 192c8.6 14.7 24.4 23.8 41.5 23.8h224c17.1 0 32.9-9.1 41.5-23.8l112-192c8.7-14.9 8.7-33.4 0-48.4l-112-192z'></path>
+                    </svg>
+                </span>
+            </div>
+
+            <div class="text-center space-y-2">
+                <span class="font-serif font-black text-xl text-white tracking-widest">Lic. Andrés Trejo Maldonado</span>
+                <p class="text-xs text-slate-500 uppercase tracking-widest">Ecosistema Healthtech & Logro Optimizado 2030</p>
+                <p class="text-[10px] text-slate-655 mt-2">&copy; 2026 Equipo en Acción®. Todos los derechos reservados.</p>
+            </div>
+            
+            <div class="flex space-x-6 mt-2">
+                <a href="#" class="hover:text-white transition w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400" aria-label="LinkedIn"><i class="fab fa-linkedin text-lg"></i></a>
+                <a href="#" class="hover:text-white transition w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400" aria-label="Twitter"><i class="fab fa-twitter text-lg"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LÓGICA DE CONTROL: LOADER, DARK MODE Y FÍSICAS MATTER.JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. GESTOR DE LOADER & SCROLL LOCK ---
+            const loader = document.getElementById('loader');
+            // Bloqueamos el scroll
+            document.body.style.overflow = 'hidden';
+            
+            window.addEventListener('load', () => {
+                // Pequeño delay de 800ms para lucir el loader institucional
+                setTimeout(() => {
+                    loader.style.opacity = '0';
+                    loader.style.pointerEvents = 'none';
+                    document.body.style.overflow = ''; // Restaurar scroll
+                    setTimeout(() => {
+                        loader.style.display = 'none';
+                    }, 500);
+                }, 800);
+            });
+
+            // --- 2. GESTOR DE DARK MODE ---
+            const toggleBtn = document.getElementById('dark-mode-toggle');
+            const toggleBtnMobile = document.getElementById('dark-mode-toggle-mobile');
+            
+            function toggleDarkMode() {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+            }
+
+            toggleBtn.addEventListener('click', toggleDarkMode);
+            toggleBtnMobile.addEventListener('click', toggleDarkMode);
+
+            // Carga inicial de tema preferido
+            if (localStorage.getItem('theme') === 'dark' || 
+                (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // --- 3. MENÚ MÓVIL ---
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // --- 4. MOTOR DE FÍSICA MATTER.JS INTEGRADO (DOM-PHYSICS DECOUPLING) ---
+            const { Engine, World, Bodies, Composite, Mouse, MouseConstraint } = Matter;
+            
+            const container = document.getElementById('canvas-physics-container');
+            const sandbox = document.getElementById('physics-sandbox');
+            const domElements = document.querySelectorAll('.physics-body');
+            
+            const engine = Engine.create();
+            const world = engine.world;
+            world.gravity.y = 0.55; // Gravedad descendente
+
+            // Obtener dimensiones reales del contenedor de física
+            let width = container.offsetWidth || 350;
+            let height = container.offsetHeight || 500;
+
+            // Límites del mundo físico (suelo y paredes)
+            const ground = Bodies.rectangle(width / 2, height + 30, width * 2, 60, { isStatic: true });
+            const leftWall = Bodies.rectangle(-30, height / 2, 60, height * 2, { isStatic: true });
+            const rightWall = Bodies.rectangle(width + 30, height / 2, 60, height * 2, { isStatic: true });
+            const ceiling = Bodies.rectangle(width / 2, -30, width * 2, 60, { isStatic: true });
+            
+            World.add(world, [ground, leftWall, rightWall, ceiling]);
+
+            // Mapear elementos del DOM a cuerpos de Matter.js
+            const bodies = [];
+            
+            // Fricciones y restituciones por defecto (Evita que fluyan como hielo)
+            const bodyOptions = {
+                restitution: 0.65, // Rebote controlado y vivo
+                friction: 0.12,    // Rozamiento natural
+                density: 0.0012    // Masa proporcional
+            };
+
+            domElements.forEach((el, index) => {
+                const elWidth = el.offsetWidth;
+                const elHeight = el.offsetHeight;
+                
+                // Spawning vertical escalonado y centrado para evitar desbordamiento y masa infinita en móviles
+                const x = (width / 2) + (Math.random() * 40 - 20);
+                const y = -elHeight - (index * 45); 
+                
+                let body;
+                const isHexagon = el.getAttribute('data-shape') === 'hexagon';
+                
+                if (isHexagon) {
+                    // Para hexágonos físicos, usamos un polígono en Matter.js con 6 lados
+                    const radius = Math.max(elWidth, elHeight) / 2;
+                    body = Bodies.polygon(x, y, 6, radius, bodyOptions);
+                } else {
+                    // Para píldoras/rectángulos normales
+                    body = Bodies.rectangle(x, y, elWidth, elHeight, bodyOptions);
+                }
+                
+                body.element = el;
+                bodies.push(body);
+                World.add(world, body);
+            });
+
+            // Añadir interacción de mouse
+            const mouse = Mouse.create(sandbox);
+            const mouseConstraint = MouseConstraint.create(engine, {
+                mouse: mouse,
+                constraint: {
+                    stiffness: 0.2,
+                    render: { visible: false }
+                }
+            });
+            World.add(world, mouseConstraint);
+            
+            // Permitir el scroll nativo sobre el canvas de física
+            mouseConstraint.mouse.element.removeEventListener("mousewheel", mouseConstraint.mouse.mousewheel);
+            mouseConstraint.mouse.element.removeEventListener("DOMMouseScroll", mouseConstraint.mouse.mousewheel);
+
+            // --- SINCRONIZADOR DE FÍSICA DETALLADO CON CONTROLES DELTA ---
+            let lastTime = performance.now();
+            let physicsFrameId = null;
+
+            function startPhysicsLoop() {
+                function updatePhysics(time) {
+                    // Delta dinámico
+                    let delta = time - lastTime;
+                    lastTime = time;
+                    
+                    // Bounded Step: Acotado a máximo 30ms para evitar efecto túnel en colisiones rápidas
+                    const boundedDelta = Math.min(delta, 30);
+                    
+                    Engine.update(engine, boundedDelta);
+                    
+                    // Sincronizar coordenadas físicas con transformación 3D acelerada en GPU
+                    bodies.forEach(body => {
+                        if (!body.element) return;
+                        
+                        const { x, y } = body.position;
+                        const angle = body.angle;
+                        
+                        const midX = body.element.offsetWidth / 2;
+                        const midY = body.element.offsetHeight / 2;
+                        
+                        // translate3d evita Reflows del navegador
+                        body.element.style.transform = `translate3d(${x - midX}px, ${y - midY}px, 0) rotate(${angle}rad)`;
+                    });
+                    
+                    physicsFrameId = requestAnimationFrame(updatePhysics);
+                }
+                physicsFrameId = requestAnimationFrame(updatePhysics);
+            }
+
+            // Iniciar bucle
+            startPhysicsLoop();
+
+            // Soportar Resize Responsive del Contenedor de Físicas
+            window.addEventListener('resize', () => {
+                const newWidth = container.offsetWidth || 350;
+                const newHeight = container.offsetHeight || 500;
+                
+                // Reposicionar suelo y paredes estáticas
+                Matter.Body.setPosition(ground, { x: newWidth / 2, y: newHeight + 30 });
+                Matter.Body.setPosition(rightWall, { x: newWidth + 30, y: newHeight / 2 });
+                Matter.Body.setPosition(leftWall, { x: -30, y: newHeight / 2 });
+                
+                width = newWidth;
+                height = newHeight;
+            });
+        });
+    </script>
+</body>
+</html>
